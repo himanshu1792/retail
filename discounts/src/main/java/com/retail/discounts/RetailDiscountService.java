@@ -1,64 +1,78 @@
 package com.retail.discounts;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
 @Service
 public class RetailDiscountService {
-	
-	static List<String> userTypes = null;
+
+	static Map<Integer, User> userTypesMap = null;
 
 	static {
 
-		userTypes = new ArrayList<String>();
-		userTypes.add("employee");
-		userTypes.add("affiliated");
-		userTypes.add("oldEmployee");
+		userTypesMap = new HashMap<Integer, User>();
+		userTypesMap.put(1, new Employee());
+		userTypesMap.put(2, new AffiliateUser());
+		userTypesMap.put(3, new OldCustomer());
 
 	}
-	
-	public int calculateDiscountForUser(Item item, String usertype, String bill) {
-		
+
+	public int calculateDiscountForUser(Bill bill) throws Exception {
+
 		int finalBill = 0;
-		int billVal = Integer.valueOf(bill);
-		if(item.getItemType().equalsIgnoreCase("groceries")) {
-			
-			finalBill = billVal;
-			return finalBill;
-		}
-		boolean discountApplied = false;
-		if (userTypes.contains(usertype)) {
-			discountApplied = true;
-			if (usertype.equalsIgnoreCase("employee")) {
 
-				float num = (float) ((billVal * 30.0) / 100);
-				finalBill = billVal - ((int) num);
-			} else if (usertype.equalsIgnoreCase("affiliated")) {
+		List<Item> itemList = bill.getItemList();
+		User user = userTypesMap.get(bill.getUserType());
 
-				float num = (float) ((billVal * 10.0) / 100);
-				finalBill = billVal - ((int) num);
-			} else if (usertype.equalsIgnoreCase("oldEmployee")) {
+		for (Item item : itemList) {
+			String itemType = item.getItemType();
 
-				float num = (float) ((billVal * 5.0) / 100);
-				finalBill = billVal - ((int) num);
+			if (!ItemTypes.GROCERIES.toString().equals(itemType)) {
+
+				if (user != null) {
+
+					int itemBill = calculateBillForItem(item, user.getUserDiscount());
+					finalBill = finalBill + itemBill;
+				} else {
+					finalBill = finalBill + Integer.parseInt(item.getQuantity()) * Integer.parseInt(item.getValue());
+				}
+
+			} else {
+
+				finalBill = finalBill + Integer.parseInt(item.getQuantity()) * Integer.parseInt(item.getValue());
+
 			}
 
 		}
-
-		if (!discountApplied && billVal >= 100) {
-
-			finalBill = billVal - 5;
-
-		}
-
-		if(finalBill==0) {
-			
-			finalBill=billVal;
-		}
-		
+		finalBill = calculateDiscountForEntireBillAmount(finalBill);
 		return finalBill;
+	}
+
+	private int calculateBillForItem(Item item, int userDiscount) {
+		// TODO Auto-generated method stub
+
+		int quantity = Integer.parseInt(item.getQuantity());
+		int value = Integer.parseInt(item.getValue());
+
+		int totalPrice = quantity * value;
+
+		float discountForUser = (float) ((totalPrice * userDiscount) / 100);
+
+		int billAfterDiscount = totalPrice - ((int) discountForUser);
+
+		return billAfterDiscount;
+	}
+
+	private int calculateDiscountForEntireBillAmount(int billVal) {
+		// TODO Auto-generated method stub
+		int disc = 0;
+
+		disc = billVal - (billVal / 100) * 5;
+
+		return disc;
 	}
 
 }

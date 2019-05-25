@@ -14,14 +14,13 @@ public class RetailDiscountController {
 	@Autowired
 	private RetailDiscountService retailDiscountService;
 
-	@RequestMapping(value = "/discount/{usertype}/{bill}", method = RequestMethod.POST)
-	public String calculateDiscount(@RequestBody String body,@PathVariable("usertype") String usertype,
-			@PathVariable("bill") String bill) {
+	@RequestMapping(value = "/discount", method = RequestMethod.POST)
+	public String calculateDiscount(@RequestBody String body) {
 
 		String returnValue = null;
 		try {
-			Item item = CommonUtils.jsonStringToObject(body, Item.class);
-			int finalBill = retailDiscountService.calculateDiscountForUser(item, usertype, bill);
+			Bill bill = CommonUtils.jsonStringToObject(body, Bill.class);
+			int finalBill = retailDiscountService.calculateDiscountForUser(bill);
 
 			returnValue = "Final bill after discount is " + finalBill;
 		} catch (Exception e) {
