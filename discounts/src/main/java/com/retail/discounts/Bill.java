@@ -2,22 +2,28 @@ package com.retail.discounts;
 
 import java.util.List;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+
 public class Bill {
 
+	@Valid
 	private List<Item> itemList;
-	private int userType;
+	@NotBlank(message="user type must not be blank")
+	private String userType;
 	public List<Item> getItemList() {
 		return itemList;
 	}
 	public void setItemList(List<Item> itemList) {
 		this.itemList = itemList;
 	}
-	public int getUserType() {
+	public String getUserType() {
 		return userType;
 	}
-	public void setUserType(int userType) {
+	public void setUserType(String userType) {
 		this.userType = userType;
 	}
+
 	
 	
 	

@@ -2,7 +2,9 @@ package com.retail.discounts;
 
 import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,5 +29,20 @@ private static ObjectMapper mapper = new ObjectMapper();
         mapper.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
         return mapper.readValue(jsonString, classType);
     }
+	 public static String objectToJsonString(Object o) throws JsonProcessingException
+	    {
+	        if (o == null)
+	        {
+	            return null;
+	        }
+	        mapper.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
+	        mapper.setSerializationInclusion(Include.NON_NULL);
+	        mapper.enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING);
+	        mapper.enable(DeserializationFeature.READ_ENUMS_USING_TO_STRING);
+	        mapper.enable(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS);
+	        mapper.configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false);
+	        
+	        return mapper.writeValueAsString(o);
+	    }
 
 }
